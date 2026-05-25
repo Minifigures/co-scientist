@@ -15,22 +15,20 @@ A **Supervisor** schedules agents via a durable task queue (SQLite-backed) with 
 
 ## Status
 
-**Through M3 — first vertical slice runnable.** Shipped so far:
+**Through M9 — full system shipped.** 88 unit tests passing, ruff clean.
 
-- **M0 — Skeleton.** Package structure, configuration loader, SQLite schema + migrations (12 tables incl. spans/events/elo_journal), ULID + deterministic-hash IDs, structlog JSONL logging, Typer CLI scaffold.
-- **M1 — Storage, vectors, tools.** Repos for sessions/hypotheses/reviews/tasks/tournaments/transcripts/feedback/embeddings/events/spans; Voyage+OpenAI embedders; FAISS `IndexFlatIP` per-session store; built-in tools (`web_search`, `web_fetch`, `pubmed_search`, `arxiv_search`, `europe_pmc_search`); science-skills bridge that parses `SKILL.md` + shells out to scripts; `co-scientist tools list` lists everything per-agent.
-- **M2 — Anthropic SDK layer.** All 14 prompt templates (verbatim from `reference/9` where they exist; synthesized where the reference is silent); Jinja2 loader; retry policy honoring Retry-After for 429/529; `TokenBudget` with per-agent shares and async-locked admission; model routing with never-degrade list (`reflection.verification`, `metareview.final`); `AnthropicClient` with 4-tier `cache_control` breakpoints, retry, transcript persistence, USD accounting; tool-loop driver with parallel cap and URL tracking for citation honesty; `UNTRUSTED_SOURCE` quoting for prompt-injection defense.
-- **M3 — Generation + Reflection vertical slice.** `BaseAgent`; `GenerationAgent` (literature strategy) with `record_hypothesis` tool, dedup via FAISS, citation filter against tool-loop URLs; `ReflectionAgent` (full review) with `record_review` tool, evidence URL filter; minimal `Supervisor` that parses the goal, enqueues N Generation tasks, drains the queue with a bounded asyncio worker pool, runs one Reflection per new hypothesis, and writes a stub overview; `co-scientist run "goal"` end-to-end.
+- **M0 — Skeleton.** Package layout, pydantic-settings config, SQLite schema + migrations (12 tables incl. `spans`/`events`/`elo_journal`), ULID + deterministic-hash IDs, structlog JSONL logging.
+- **M1 — Storage, vectors, tools.** 10 repos; Voyage+OpenAI embedders; FAISS `IndexFlatIP` per-session store; built-in tools (`web_search`, `web_fetch`, `pubmed_search`, `arxiv_search`, `europe_pmc_search`); science-skills bridge that parses `SKILL.md` + shells out to scripts with a path-traversal guard.
+- **M2 — Anthropic SDK layer.** 14 prompt templates; Jinja2 loader; retry honoring Retry-After for 429/529; `TokenBudget` with per-agent shares; model routing with never-degrade list; `AnthropicClient` with 4-tier `cache_control`, retry, transcript persistence, USD accounting; tool-loop driver that preserves thinking-block signatures and tracks URLs for citation honesty; `UNTRUSTED_SOURCE` quoting for prompt-injection defense.
+- **M3 — Generation + Reflection.** `BaseAgent`; literature-strategy `GenerationAgent` with `record_hypothesis` tool, dedup via FAISS, hallucinated-URL filter; full-mode `ReflectionAgent` with `record_review` + URL filter.
+- **M4 — Ranking + Elo tournament.** `AddToTournament` + `RunTournamentBatch` with pair selection weighted by `exp(-Δelo/200) · (1 - cosine_sim)`, debate-vs-pairwise mode switching, anchor-cached debates, idempotent `elo_journal` updates.
+- **M5 — Supervisor scheduling.** Durable resume with lease reclaim + max-attempts dead-letter; hybrid termination (BUDGET / WALL_CLOCK / ELO_STABLE / EXTERNAL); `StabilityTracker` with snapshot history; `decide_next_steps` for idle refinement; pause/resume/abort via DB-flagged session.status. In-memory `EventBus` shared with the web UI.
+- **M6 — Evolution + Proximity + Meta-review.** Evolution strategies (combine on most-distant top pair, simplify, feasibility, out_of_box) with parent_ids; Proximity batch recluster with sklearn agglomerative; periodic Meta-review system feedback (auto-injected into future Generation/Evolution prompts); final research overview synthesis.
+- **M7 — Web UI.** FastAPI + Jinja2 + htmx + Pico.css + SSE. Pages: sessions index, new session form, session dashboard (live leaderboard, match feed, budget gauges), hypothesis detail with reviews, final overview. API endpoints for pause/resume/abort/feedback. `co-scientist serve` boots both the UI and a Supervisor in one process.
+- **M8 — Safety + observability + evals.** Haiku-backed safety classifier with allow/warn/quarantine/block actions; citation verifier (fetch URL, check excerpt-substring); read-only `obs/metrics` (tokens, cost, cache hit ratio, P50/P95 latency, dead tasks) backing `/api/sessions/{id}/metrics`; LLM-as-judge rubric runner with bundled fixtures; `co-scientist eval [agent] [--offline]`.
+- **M9 — Batch API + estimator + resume hardening.** `BatchPool` for sub-decile tournament matches (50% cheaper Batch API submission with safe requeue on failure); pre-flight `estimator` that warns when projected USD spend > 1.2x budget; `co-scientist estimate` subcommand.
 
-**45 unit tests passing.** No network calls in CI: Anthropic + embeddings + web tools are exercised via dedicated tests where possible and gated behind a manual smoke test otherwise.
-
-### What's still ahead (per plan)
-- **M4** — Ranking + Elo tournament (`AddToTournament`, `RunTournamentBatch`, pair selection, debate-vs-pairwise mode switching, `elo_journal` idempotency at the agent level).
-- **M5** — Full Supervisor scheduling: `decide_next_steps`, follow-up rules, lease/heartbeat, crash recovery, dead-letter, pause/resume/abort.
-- **M6** — Evolution + Proximity + Meta-review (system feedback periodic + final overview synthesis).
-- **M7** — FastAPI + htmx + SSE web UI.
-- **M8** — Safety classifier, citation verifier, spans/metrics, eval scaffolding.
-- **M9** — Batch API for sub-decile tournament matches; cost estimator pre-flight; resume hardening.
+**No network calls in CI** — Anthropic / embeddings / web tools are mocked or stubbed; live smoke tests are manual.
 
 ## Install
 

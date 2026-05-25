@@ -189,7 +189,7 @@ def run(
         None, "--concurrency", help="Override worker concurrency."
     ),
 ) -> None:
-    """Start a fresh research session (M3 vertical slice: Generation + Reflection)."""
+    """Start a fresh research session. Generation → Reflection → Ranking tournament → Meta-review."""
     cfg, _ = ctx.obj
     if not has_anthropic_key(cfg):
         console.print("[red]ANTHROPIC_API_KEY is not set. See .env.example.[/red]")
@@ -199,6 +199,19 @@ def run(
         cfg.run.budget_usd = budget_usd
     if concurrency is not None:
         cfg.run.concurrency = concurrency
+
+    # Pre-flight cost estimate
+    from .llm.estimator import estimate as _estimate
+
+    est = _estimate(cfg)
+    console.print(
+        f"[dim]Pre-flight estimate: ${est.total_usd:.2f} "
+        f"(budget ${cfg.run.budget_usd:.2f}, "
+        f"max_ideas={cfg.run.max_ideas}, "
+        f"max_matches_per_idea={cfg.run.max_matches_per_idea})[/dim]"
+    )
+    if est.warning:
+        console.print(f"[yellow]{est.warning}[/yellow]")
 
     prefs = preferences_file.read_text() if preferences_file else None
     from .agents.supervisor import Supervisor
@@ -355,6 +368,16 @@ def serve(
     from .web.app import create_app
 
     uvicorn.run(create_app(cfg), host=host, port=port, log_level="info")
+
+
+@app.command()
+def estimate(ctx: typer.Context) -> None:
+    """Print the pre-flight cost estimate without launching a session."""
+    cfg, _ = ctx.obj
+    from .llm.estimator import estimate as _estimate
+
+    est = _estimate(cfg)
+    console.print_json(data=est.to_dict())
 
 
 @app.command("eval")
