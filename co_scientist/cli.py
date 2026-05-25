@@ -1,0 +1,297 @@
+"""Typer CLI entrypoint.
+
+M0 surface: init, list, status, tools list, serve, version. Run/resume/report/feedback
+land in M3+. All commands resolve config the same way; secrets come from env.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import contextlib
+import json
+from pathlib import Path
+
+import typer
+from rich.console import Console
+from rich.table import Table
+
+from .config import has_anthropic_key, load_config
+from .logging import get_logger, setup_logging
+from .storage import db as db_mod
+
+VERSION = "0.1.0"
+
+app = typer.Typer(
+    help="AI Co-Scientist — multi-agent hypothesis generation, ranking, and synthesis.",
+    no_args_is_help=True,
+    add_completion=False,
+)
+tools_app = typer.Typer(help="Tool registry inspection and debug invocation.", no_args_is_help=True)
+app.add_typer(tools_app, name="tools")
+
+console = Console()
+log = get_logger("cli")
+
+
+def _common_setup(config_file: Path | None = None, verbose: bool = False) -> tuple:
+    setup_logging("DEBUG" if verbose else "INFO")
+    cfg = load_config(config_file)
+    return cfg, log
+
+
+@app.callback()
+def _main(
+    ctx: typer.Context,
+    config_file: Path | None = typer.Option(
+        None, "--config", "-c", help="Path to an extra TOML config to overlay."
+    ),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose (DEBUG) logging."),
+) -> None:
+    ctx.obj = _common_setup(config_file, verbose)
+
+
+@app.command()
+def version() -> None:
+    """Print the co-scientist version."""
+    console.print(f"co-scientist {VERSION}")
+
+
+@app.command()
+def init(ctx: typer.Context) -> None:
+    """Create the data directory, apply migrations, sanity-check env."""
+    cfg, _ = ctx.obj
+    cfg.data_dir.mkdir(parents=True, exist_ok=True)
+    (cfg.data_dir / "artifacts").mkdir(exist_ok=True)
+    (cfg.data_dir / "vectors").mkdir(exist_ok=True)
+    (cfg.data_dir / "logs").mkdir(exist_ok=True)
+
+    asyncio.run(db_mod.init_db(cfg))
+
+    # Report
+    tbl = Table(title="Init complete", show_header=False, box=None)
+    tbl.add_row("data dir", str(cfg.data_dir))
+    tbl.add_row("database", str(cfg.db_path))
+    tbl.add_row("anthropic key set", "yes" if has_anthropic_key(cfg) else "[red]no[/red]")
+    tbl.add_row("science-skills", cfg.science_skills.path)
+    console.print(tbl)
+
+    if not has_anthropic_key(cfg):
+        console.print(
+            "[yellow]ANTHROPIC_API_KEY is not set. Most commands will require it. "
+            "See .env.example.[/yellow]"
+        )
+
+
+@app.command(name="list")
+def list_sessions(ctx: typer.Context) -> None:
+    """List all sessions in the local database."""
+    cfg, _ = ctx.obj
+
+    async def _run() -> list[dict]:
+        conn = await db_mod.connect(cfg)
+        try:
+            async with conn.execute(
+                """SELECT id, status, research_goal, created_at, updated_at,
+                          budget_usd, budget_used_usd,
+                          (SELECT COUNT(*) FROM hypotheses WHERE session_id = s.id) AS n_hyps,
+                          (SELECT MAX(elo) FROM hypotheses WHERE session_id = s.id) AS top_elo
+                     FROM sessions s
+                     ORDER BY updated_at DESC"""
+            ) as cur:
+                rows = await cur.fetchall()
+            return [dict(r) for r in rows]
+        finally:
+            await conn.close()
+
+    rows = asyncio.run(_run())
+    if not rows:
+        console.print("[dim]No sessions yet. Try:  co-scientist run \"your research goal\"[/dim]")
+        return
+
+    tbl = Table(title="Sessions")
+    tbl.add_column("id")
+    tbl.add_column("status")
+    tbl.add_column("goal", overflow="fold", max_width=60)
+    tbl.add_column("hyps", justify="right")
+    tbl.add_column("top Elo", justify="right")
+    tbl.add_column("$ used / $ budget", justify="right")
+    tbl.add_column("updated")
+    for r in rows:
+        tbl.add_row(
+            r["id"],
+            r["status"],
+            (r["research_goal"] or "")[:80],
+            str(r["n_hyps"]),
+            f"{r['top_elo']:.0f}" if r["top_elo"] is not None else "—",
+            f"${r['budget_used_usd']:.2f} / ${r['budget_usd']:.2f}",
+            r["updated_at"],
+        )
+    console.print(tbl)
+
+
+@app.command()
+def status(ctx: typer.Context, session_id: str = typer.Argument(...)) -> None:
+    """Show detailed status for one session."""
+    cfg, _ = ctx.obj
+
+    async def _run() -> dict:
+        conn = await db_mod.connect(cfg)
+        try:
+            async with conn.execute("SELECT * FROM sessions WHERE id = ?", (session_id,)) as cur:
+                row = await cur.fetchone()
+            if row is None:
+                return {}
+            out = dict(row)
+            for col in ("research_plan", "config_snapshot"):
+                with contextlib.suppress(Exception):
+                    out[col] = json.loads(out[col])
+            async with conn.execute(
+                """SELECT status, COUNT(*) AS n FROM tasks
+                       WHERE session_id = ? GROUP BY status""",
+                (session_id,),
+            ) as cur:
+                out["task_counts"] = {r["status"]: r["n"] for r in await cur.fetchall()}
+            async with conn.execute(
+                """SELECT state, COUNT(*) AS n FROM hypotheses
+                       WHERE session_id = ? GROUP BY state""",
+                (session_id,),
+            ) as cur:
+                out["hypothesis_states"] = {r["state"]: r["n"] for r in await cur.fetchall()}
+            return out
+        finally:
+            await conn.close()
+
+    out = asyncio.run(_run())
+    if not out:
+        console.print(f"[red]No session {session_id}[/red]")
+        raise typer.Exit(1)
+    console.print_json(data=out)
+
+
+@app.command()
+def run(
+    ctx: typer.Context,
+    goal: str = typer.Argument(..., help="Research goal in natural language."),
+    preferences_file: Path | None = typer.Option(
+        None, "--preferences-file", help="Path to a text file with extra preferences."
+    ),
+    n_initial: int = typer.Option(
+        3, "--n", help="Number of initial Generation calls (parallel)."
+    ),
+    wall_clock: int | None = typer.Option(
+        None, "--wall-clock", help="Override wall-clock cap in seconds."
+    ),
+    budget_usd: float | None = typer.Option(
+        None, "--budget-usd", help="Override session USD budget."
+    ),
+    concurrency: int | None = typer.Option(
+        None, "--concurrency", help="Override worker concurrency."
+    ),
+) -> None:
+    """Start a fresh research session (M3 vertical slice: Generation + Reflection)."""
+    cfg, _ = ctx.obj
+    if not has_anthropic_key(cfg):
+        console.print("[red]ANTHROPIC_API_KEY is not set. See .env.example.[/red]")
+        raise typer.Exit(1)
+
+    if budget_usd is not None:
+        cfg.run.budget_usd = budget_usd
+    if concurrency is not None:
+        cfg.run.concurrency = concurrency
+
+    prefs = preferences_file.read_text() if preferences_file else None
+    from .agents.supervisor import Supervisor
+
+    sup = Supervisor(cfg)
+    session_id = asyncio.run(
+        sup.run_session(goal, preferences_text=prefs, n_initial=n_initial,
+                        wall_clock_seconds=wall_clock)
+    )
+    console.print(f"[green]Done.[/green] session={session_id}")
+    console.print(f"View report:  co-scientist report {session_id}")
+
+
+@app.command()
+def resume(ctx: typer.Context, session_id: str = typer.Argument(...)) -> None:
+    """[M5+] Resume a paused or crashed session."""
+    _ = ctx, session_id
+    console.print("[yellow]`resume` lands in M5.[/yellow]")
+    raise typer.Exit(2)
+
+
+@app.command()
+def report(
+    ctx: typer.Context,
+    session_id: str = typer.Argument(...),
+    format: str = typer.Option("md", "--format", "-f", help="md or json"),
+) -> None:
+    """Print the final research overview for a session (when available)."""
+    cfg, _ = ctx.obj
+
+    async def _path() -> Path | None:
+        conn = await db_mod.connect(cfg)
+        try:
+            async with conn.execute(
+                "SELECT final_overview FROM sessions WHERE id = ?", (session_id,)
+            ) as cur:
+                row = await cur.fetchone()
+            if not row or not row["final_overview"]:
+                return None
+            return cfg.data_dir / row["final_overview"]
+        finally:
+            await conn.close()
+
+    p = asyncio.run(_path())
+    if p is None:
+        console.print(f"[red]No final overview yet for {session_id}[/red]")
+        raise typer.Exit(1)
+    text = p.read_text()
+    if format == "json":
+        console.print_json(data={"session_id": session_id, "path": str(p), "content": text})
+    else:
+        console.print(text)
+
+
+@app.command()
+def serve(
+    ctx: typer.Context,
+    host: str | None = typer.Option(None, "--host"),
+    port: int | None = typer.Option(None, "--port"),
+) -> None:
+    """[M7+] Launch the FastAPI web UI."""
+    _ = ctx, host, port
+    console.print("[yellow]`serve` lands in M7.[/yellow]")
+    raise typer.Exit(2)
+
+
+@tools_app.command("list")
+def tools_list(ctx: typer.Context) -> None:
+    """List registered tools (builtins + any discovered science-skills)."""
+    cfg, _ = ctx.obj
+    from .tools.registry import AGENT_TOOLS, ToolRegistry
+
+    reg = ToolRegistry(cfg).discover()
+    tbl = Table(title=f"Tools ({len(reg.all())})")
+    tbl.add_column("name", style="bold")
+    tbl.add_column("description", overflow="fold")
+    for item in reg.summary():
+        tbl.add_row(item["name"], item["description"])
+    console.print(tbl)
+
+    # Show per-agent allowlist resolution counts
+    tbl2 = Table(title="Per-agent tool availability")
+    tbl2.add_column("agent")
+    tbl2.add_column("# tools", justify="right")
+    tbl2.add_column("allowlist (patterns)")
+    for agent, patterns in AGENT_TOOLS.items():
+        ts = reg.tools_for(agent)
+        tbl2.add_row(agent, str(len(ts)), ", ".join(sorted(patterns)) or "—")
+    console.print(tbl2)
+
+
+def main() -> None:  # pragma: no cover
+    app()
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

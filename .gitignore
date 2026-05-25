@@ -1,0 +1,37 @@
+reference/*
+
+# Runtime data
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# Secrets
+.env
+.env.local
+
+# Vendor (large pinned external repos)
+vendor/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.eggs/
+build/
+dist/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Tests / tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
