@@ -1,0 +1,1311 @@
+# Bench results
+
+Auto-generated from `data/co_scientist.db` by `python scripts/build_bench_report.py`. Re-run after any new `co-scientist bench` to refresh.
+
+## How to read this doc
+
+1. **Index** below lists every bench ever run on this machine, one row per bench. Click a bench-id link to jump to its detail.
+2. **Per-bench detail** shows, for each bench:
+   - the goal it was given,
+   - the candidate result table (Elo, hits, $),
+   - **every hypothesis the bench produced** with its full statement,
+     attributed to the model that produced it (from the bench-match table),
+   - **post-hoc rescore** against every registered gold set — so a bench that ran with `aml-repurposing-paper-top3` at the time can still show whether any hypothesis would have hit the broader `aml-repurposing-paper-5` list, and vice versa,
+   - **file pointers** for the artifacts on disk + ready-to-run SQL for the raw DB rows.
+
+**Total benches:** 19 · **With gold-set scoring:** 6
+
+## Index of recorded benches
+
+| bench | created | preset / kind | n_cand | n_matches | total $ | goldset | hits |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [`bnc_01KSG616HEJDMHFVVJGP…`](#bench-bnc_01ksg616hejdmhfvvjgprzgab6) | 2026-05-25T18:23:24Z | microbiome smoke | 2 | 0 | $0.0009 | `—` | — |
+| [`bnc_01KSG6415G35N653G91G…`](#bench-bnc_01ksg6415g35n653g91g8b9p8z) | 2026-05-25T18:24:57Z | microbiome smoke | 2 | 1 | $0.0140 | `—` | — |
+| [`bnc_01KSG693N61YY9CSAKK8…`](#bench-bnc_01ksg693n61yy9csakk86vfevr) | 2026-05-25T18:27:43Z | microbiome smoke | 2 | 0 | $0.0105 | `—` | — |
+| [`bnc_01KSG6A6JW4DZ95NDJPK…`](#bench-bnc_01ksg6a6jw4dz95ndjpk9561jq) | 2026-05-25T18:28:19Z | microbiome smoke | 2 | 0 | $0.0328 | `—` | — |
+| [`bnc_01KSG6BYTB7KK8NDFJDA…`](#bench-bnc_01ksg6bytb7kk8ndfjdajht3j9) | 2026-05-25T18:29:16Z | microbiome smoke | 2 | 0 | $0.0069 | `—` | — |
+| [`bnc_01KSG6FCQPP5T4K5V0PW…`](#bench-bnc_01ksg6fcqpp5t4k5v0pw402dpe) | 2026-05-25T18:31:09Z | microbiome smoke | 2 | 2 | $0.0199 | `—` | — |
+| [`bnc_01KSG6GM23ERB68V6BCF…`](#bench-bnc_01ksg6gm23erb68v6bcf9xbs2b) | 2026-05-25T18:31:49Z | microbiome smoke | 3 | 6 | $0.0238 | `—` | — |
+| [`bnc_01KSG7AGXVXBV5XSZQ3G…`](#bench-bnc_01ksg7agxvxbv5xszq3g7nafq9) | 2026-05-25T18:45:58Z | microbiome smoke | 4 | 0 | $0.2660 | `—` | — |
+| [`bnc_01KSG7HM47116412H3NV…`](#bench-bnc_01ksg7hm47116412h3nv3vkdf8) | 2026-05-25T18:49:50Z | microbiome smoke | 4 | 12 | $0.4032 | `—` | — |
+| [`bnc_01KSGCEWXMS7T3M3FJSA…`](#bench-bnc_01ksgcewxms7t3m3fjsa9g1k5t) | 2026-05-25T20:15:44Z | AML repurposing | 2 | 0 | $0.0372 | `—` | — |
+| [`bnc_01KSGCHAN1348M7WEDX9…`](#bench-bnc_01ksgchan1348m7wedx9e449nd) | 2026-05-25T20:17:04Z | AML repurposing | 3 | 0 | $0.0099 | `—` | — |
+| [`bnc_01KSGCJSN8MGMK6H3KZV…`](#bench-bnc_01ksgcjsn8mgmk6h3kzvvqzjpg) | 2026-05-25T20:17:52Z | AML repurposing | 2 | 2 | $0.0189 | `—` | — |
+| [`bnc_01KSGCKSG3MJKVPDZBZX…`](#bench-bnc_01ksgcksg3mjkvpdzbzxm3th2g) | 2026-05-25T20:18:24Z | AML repurposing | 4 | 6 | $0.9852 | `aml-repurposing-paper-5` | 0/5 |
+| [`bnc_01KSGCTX88HHP929V9AE…`](#bench-bnc_01ksgctx88hhp929v9ae1cgqrv) | 2026-05-25T20:22:18Z | AML repurposing | 8 | 1 | $0.6977 | `aml-repurposing-paper-5` | 0/5 |
+| [`bnc_01KSGD0WKFYAF2X15P99…`](#bench-bnc_01ksgd0wkfyaf2x15p99bfax01) | 2026-05-25T20:25:34Z | AML repurposing | 4 | 12 | $0.1452 | `—` | — |
+| [`bnc_01KSGV99YG7D4DXZ8G6P…`](#bench-bnc_01ksgv99yg7d4dxz8g6pejwkv1) | 2026-05-26T00:34:49Z | AML repurposing | 4 | 0 | $0.0000 | `aml-repurposing-paper-5` | 0/5 |
+| [`bnc_01KSGVHY16Q0GHNE9ZJW…`](#bench-bnc_01ksgvhy16q0ghne9zjwzygfng) | 2026-05-26T00:39:32Z | AML repurposing | 4 | 6 | $1.8881 | `aml-repurposing-paper-top3` | 0/3 |
+| [`bnc_01KSGVRBBDNFB8MZYQZD…`](#bench-bnc_01ksgvrbbdnfb8mzyqzd30p180) | 2026-05-26T00:43:02Z | AML repurposing | 8 | 15 | $0.8730 | `aml-repurposing-paper-top3` | 0/3 |
+| [`bnc_01KSGW0H3KH2CTGV4JCT…`](#bench-bnc_01ksgw0h3kh2ctgv4jctwc63v1) | 2026-05-26T00:47:30Z | AML repurposing | 8 | 1 | $1.8255 | `aml-repurposing-paper-top3` | 0/3 |
+
+## Per-bench detail
+
+<a id="bench-bnc_01ksg616hejdmhfvvjgprzgab6"></a>
+## Bench `bnc_01KSG616HEJDMHFVVJGPRZGAB6`
+
+- **Created:** 2026-05-25T18:23:24.210826+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-2.5-pro`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0009
+- **Matches played:** 0
+- **Session:** `ses_01KSG616HKWF8K9GC4MSRQN386`
+- **Bench artifact:** `artifacts/ses_01KSG616HKWF8K9GC4MSRQN386/bench/bnc_01KSG616HEJDMHFVVJGPRZGAB6.json`
+
+**Goal:**
+
+> Identify two hypotheses about microbiome-driven inflammation
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash25` | pipeline | 0 | — | — | 0/— | $0.0004 | — |  |
+| `flash3` | pipeline | 0 | — | — | 0/— | $0.0006 | — |  |
+
+_No hypotheses produced (every candidate failed)._
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSG616HKWF8K9GC4MSRQN386/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSG616HKWF8K9GC4MSRQN386/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSG616HKWF8K9GC4MSRQN386/bench/bnc_01KSG616HEJDMHFVVJGPRZGAB6.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSG616HEJDMHFVVJGPRZGAB6';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSG616HEJDMHFVVJGPRZGAB6';
+```
+
+<a id="bench-bnc_01ksg6415g35n653g91g8b9p8z"></a>
+## Bench `bnc_01KSG6415G35N653G91G8B9P8Z`
+
+- **Created:** 2026-05-25T18:24:57.012161+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-2.5-pro`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0140
+- **Matches played:** 1
+- **Session:** `ses_01KSG6415MR30Q45K24E1RN6BF`
+- **Bench artifact:** `artifacts/ses_01KSG6415MR30Q45K24E1RN6BF/bench/bnc_01KSG6415G35N653G91G8B9P8Z.json`
+
+**Goal:**
+
+> Identify two hypotheses about microbiome-driven inflammation
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash25` | pipeline | 1 | — | 1200 | 0/— | $0.0056 | 12.4s |  |
+| `flash3` | pipeline | 1 | — | 1200 | 0/— | $0.0083 | 12.7s |  |
+
+### Hypotheses surfaced (2 total)
+
+- **Genetically-mediated Bile Acid Dysregulation in Microbiome-driven Systemic Inflammation** — via `flash25 (pipeline)`
+  - Genetically-mediated alterations in host bile acid synthesis or enterohepatic circulation lead to a dysbiotic gut microbiome characterized by an overabundance of specific bile acid-metabolizing bacteria, which produce immunomodulatory metab
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6415MR30Q45K24E1RN6BF/hypotheses/hyp_6e6a238879a8f416.json`](data/artifacts/ses_01KSG6415MR30Q45K24E1RN6BF/hypotheses/hyp_6e6a238879a8f416.json)
+- **The Akkermansia Paradox: Mucin-Degradation Thresholds Drive the Shift from Metabolic Symbiosis to Inflammatory Pathogeni** — via `flash3 (pipeline)`
+  - The metabolic benefits of Akkermansia muciniphila are governed by a concentration-dependent threshold where excessive mucin degradation, necessitated by low dietary fiber availability, triggers sub-clinical mucosal inflammation and metaboli
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6415MR30Q45K24E1RN6BF/hypotheses/hyp_aaf15d3f067fbf1f.json`](data/artifacts/ses_01KSG6415MR30Q45K24E1RN6BF/hypotheses/hyp_aaf15d3f067fbf1f.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSG6415MR30Q45K24E1RN6BF/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSG6415MR30Q45K24E1RN6BF/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSG6415MR30Q45K24E1RN6BF/bench/bnc_01KSG6415G35N653G91G8B9P8Z.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSG6415G35N653G91G8B9P8Z';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSG6415G35N653G91G8B9P8Z';
+```
+
+<a id="bench-bnc_01ksg693n61yy9csakk86vfevr"></a>
+## Bench `bnc_01KSG693N61YY9CSAKK86VFEVR`
+
+- **Created:** 2026-05-25T18:27:43.402528+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-2.5-pro`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0105
+- **Matches played:** 0
+- **Session:** `ses_01KSG693NBFSS3YQYYH4R41MAH`
+- **Bench artifact:** `artifacts/ses_01KSG693NBFSS3YQYYH4R41MAH/bench/bnc_01KSG693N61YY9CSAKK86VFEVR.json`
+
+**Goal:**
+
+> Identify two hypotheses about microbiome-driven inflammation
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash3` | pipeline | 1 | — | 1200 | 0/— | $0.0097 | 12.1s |  |
+| `flash25` | pipeline | 0 | — | — | 0/— | $0.0008 | — |  |
+
+### Hypotheses surfaced (1 total)
+
+- **Indole-AHR Signaling Failure in Post-Bypass Mucosal Inflammation** — via _(no match table entry)_
+  - Post-gastric bypass intestinal inflammation is driven by the depletion of commensal-derived indolic metabolites (e.g., I3PA), leading to a loss of constitutive Aryl Hydrocarbon Receptor (AHR) signaling and a subsequent rise in mucosal pro-i
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG693NBFSS3YQYYH4R41MAH/hypotheses/hyp_7880fd7bd6aff734.json`](data/artifacts/ses_01KSG693NBFSS3YQYYH4R41MAH/hypotheses/hyp_7880fd7bd6aff734.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSG693NBFSS3YQYYH4R41MAH/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSG693NBFSS3YQYYH4R41MAH/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSG693NBFSS3YQYYH4R41MAH/bench/bnc_01KSG693N61YY9CSAKK86VFEVR.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSG693N61YY9CSAKK86VFEVR';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSG693N61YY9CSAKK86VFEVR';
+```
+
+<a id="bench-bnc_01ksg6a6jw4dz95ndjpk9561jq"></a>
+## Bench `bnc_01KSG6A6JW4DZ95NDJPK9561JQ`
+
+- **Created:** 2026-05-25T18:28:19.167294+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-2.5-pro`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0328
+- **Matches played:** 0
+- **Session:** `ses_01KSG6A6K0ZCPSKTQAJ5CYWT4J`
+- **Bench artifact:** `artifacts/ses_01KSG6A6K0ZCPSKTQAJ5CYWT4J/bench/bnc_01KSG6A6JW4DZ95NDJPK9561JQ.json`
+
+**Goal:**
+
+> Identify two hypotheses about microbiome-driven inflammation
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash3` | pipeline | 1 | — | 1200 | 0/— | $0.0103 | 25.1s |  |
+| `pro25` | pipeline | 1 | — | 1200 | 0/— | $0.0225 | 17.9s |  |
+
+### Hypotheses surfaced (2 total)
+
+- **Microbial Cross-Feeding and Inflammation** — via _(no match table entry)_
+  - The anti-inflammatory effects of fermented foods are mediated by a microbial cross-feeding mechanism initiated by Lactobacillus-derived indole-3-lactic acid (ILA).
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6A6K0ZCPSKTQAJ5CYWT4J/hypotheses/hyp_5812cff97f605b12.json`](data/artifacts/ses_01KSG6A6K0ZCPSKTQAJ5CYWT4J/hypotheses/hyp_5812cff97f605b12.json)
+- **The B. melaninogenicus-TLR4 Axis in Atherosclerotic Inflammation** — via _(no match table entry)_
+  - Bacteroides melaninogenicus-derived lipopolysaccharide (LPS) acts as a systemic pro-inflammatory super-agonist of the TLR4 pathway, driving chronic vascular inflammation and accelerating the progression of atherosclerotic plaques.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6A6K0ZCPSKTQAJ5CYWT4J/hypotheses/hyp_74ec8753bbbce34a.json`](data/artifacts/ses_01KSG6A6K0ZCPSKTQAJ5CYWT4J/hypotheses/hyp_74ec8753bbbce34a.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSG6A6K0ZCPSKTQAJ5CYWT4J/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSG6A6K0ZCPSKTQAJ5CYWT4J/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSG6A6K0ZCPSKTQAJ5CYWT4J/bench/bnc_01KSG6A6JW4DZ95NDJPK9561JQ.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSG6A6JW4DZ95NDJPK9561JQ';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSG6A6JW4DZ95NDJPK9561JQ';
+```
+
+<a id="bench-bnc_01ksg6bytb7kk8ndfjdajht3j9"></a>
+## Bench `bnc_01KSG6BYTB7KK8NDFJDAJHT3J9`
+
+- **Created:** 2026-05-25T18:29:16.752113+00:00
+- **Status:** done
+- **Judge:** `openrouter:openai/gpt-4o`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0069
+- **Matches played:** 0
+- **Session:** `ses_01KSG6BYTG2GR0EGTXV9ZEYFG1`
+- **Bench artifact:** `artifacts/ses_01KSG6BYTG2GR0EGTXV9ZEYFG1/bench/bnc_01KSG6BYTB7KK8NDFJDAJHT3J9.json`
+
+**Goal:**
+
+> Identify two hypotheses about microbiome-driven inflammation
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash3` | pipeline | 1 | — | 1200 | 0/— | $0.0061 | 11.4s |  |
+| `flash25` | pipeline | 0 | — | — | 0/— | $0.0008 | — |  |
+
+### Hypotheses surfaced (1 total)
+
+- **Bile Acid 12-Oxidation as a Microbial Driver of Post-Stroke Neuroinflammation** — via _(no match table entry)_
+  - Microbiome-derived 12-oxobiliary acids, produced by stroke-induced shifts in 12-hydroxysteroid dehydrogenase-expressing gut bacteria, cross the blood-brain barrier to trigger microglial NLRP3 inflammasome activation, thereby exacerbating po
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6BYTG2GR0EGTXV9ZEYFG1/hypotheses/hyp_9961812b5f37d953.json`](data/artifacts/ses_01KSG6BYTG2GR0EGTXV9ZEYFG1/hypotheses/hyp_9961812b5f37d953.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSG6BYTG2GR0EGTXV9ZEYFG1/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSG6BYTG2GR0EGTXV9ZEYFG1/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSG6BYTG2GR0EGTXV9ZEYFG1/bench/bnc_01KSG6BYTB7KK8NDFJDAJHT3J9.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSG6BYTB7KK8NDFJDAJHT3J9';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSG6BYTB7KK8NDFJDAJHT3J9';
+```
+
+<a id="bench-bnc_01ksg6fcqpp5t4k5v0pw402dpe"></a>
+## Bench `bnc_01KSG6FCQPP5T4K5V0PW402DPE`
+
+- **Created:** 2026-05-25T18:31:09.306054+00:00
+- **Status:** done
+- **Judge:** `openrouter:openai/gpt-4o`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0199
+- **Matches played:** 2
+- **Session:** `ses_01KSG6FCQT953KKFVX05GGEPDT`
+- **Bench artifact:** `artifacts/ses_01KSG6FCQT953KKFVX05GGEPDT/bench/bnc_01KSG6FCQPP5T4K5V0PW402DPE.json`
+
+**Goal:**
+
+> Identify two hypotheses about microbiome-driven inflammation
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash3` | pipeline | 1 | 2-0 | 1231 | 0/— | $0.0091 | 10.7s |  |
+| `flash25` | pipeline | 1 | 0-2 | 1169 | 0/— | $0.0108 | 21.2s |  |
+
+### Hypotheses surfaced (2 total)
+
+- **SFB-Induced Gut-Mammary Th17 Trafficking and DNA Damage** — via `flash3 (pipeline)`
+  - The gut pathobiont Segmented Filamentous Bacteria (SFB) drives mammary gland inflammation and pre-malignant DNA damage in obesity by inducing systemic trafficking of SFB-specific Th17 cells that secrete IL-17A to trigger local oxidative str
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6FCQT953KKFVX05GGEPDT/hypotheses/hyp_09cb4e3a898e671a.json`](data/artifacts/ses_01KSG6FCQT953KKFVX05GGEPDT/hypotheses/hyp_09cb4e3a898e671a.json)
+- **Intestinal IL-17R Dysregulation and Microbiome-Mediated Hepatic Inflammation** — via `flash25 (pipeline)`
+  - Dysregulation of intestinal IL-17R signaling leads to microbiome dysbiosis and increased translocation of bacterial products, specifically CpG DNA, which subsequently drives IL-18 production in the liver, exacerbating hepatic inflammation a
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6FCQT953KKFVX05GGEPDT/hypotheses/hyp_d93b3a9725bbc24f.json`](data/artifacts/ses_01KSG6FCQT953KKFVX05GGEPDT/hypotheses/hyp_d93b3a9725bbc24f.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSG6FCQT953KKFVX05GGEPDT/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSG6FCQT953KKFVX05GGEPDT/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSG6FCQT953KKFVX05GGEPDT/bench/bnc_01KSG6FCQPP5T4K5V0PW402DPE.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSG6FCQPP5T4K5V0PW402DPE';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSG6FCQPP5T4K5V0PW402DPE';
+```
+
+<a id="bench-bnc_01ksg6gm23erb68v6bcf9xbs2b"></a>
+## Bench `bnc_01KSG6GM23ERB68V6BCF9XBS2B`
+
+- **Created:** 2026-05-25T18:31:49.575192+00:00
+- **Status:** done
+- **Judge:** `openrouter:openai/gpt-4o`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0238
+- **Matches played:** 6
+- **Session:** `ses_01KSG6GM275W3TKGG6ETH9V53X`
+- **Bench artifact:** `artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/bench/bnc_01KSG6GM23ERB68V6BCF9XBS2B.json`
+
+**Goal:**
+
+> Identify two hypotheses about microbiome-driven inflammation
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash3` | pipeline | 1 | 3-1 | 1232 | 0/— | $0.0090 | 9.8s |  |
+| `flash25` | pipeline | 1 | 3-1 | 1227 | 0/— | $0.0098 | 16.7s |  |
+| `gpt4o-mini` | pipeline | 1 | 0-4 | 1142 | 0/— | $0.0050 | 19.1s |  |
+
+### Hypotheses surfaced (3 total)
+
+- **Akkermansia P9-GLP-1 Axis for Inflammasome Suppression** — via `flash3 (pipeline)`
+  - Akkermansia muciniphila mitigates microbiome-driven systemic inflammation by secreting the P9 protein, which triggers L-cell GLP-1 production to systemically inhibit NLRP3 inflammasome activation.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/hypotheses/hyp_0e4ca278a85727ad.json`](data/artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/hypotheses/hyp_0e4ca278a85727ad.json)
+- **Gut Microbiome Dysbiosis Drives Systemic Inflammation Mediated by Immune Responses** — via `gpt4o-mini (pipeline)`
+  - Dysbiosis of the gut microbiome leads to increased systemic inflammation through the activation of immune pathways, contributing to various inflammatory conditions.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/hypotheses/hyp_b6d23e6819ba7540.json`](data/artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/hypotheses/hyp_b6d23e6819ba7540.json)
+- **Microbiome-Bile Acid Dysregulation Drives PCOS Inflammation** — via `flash25 (pipeline)`
+  - Dysbiosis of the gut microbiota contributes to systemic low-grade inflammation in Polycystic Ovary Syndrome (PCOS) by impairing bile acid metabolism and increasing circulating pro-inflammatory cytokines, leading to insulin resistance and hy
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/hypotheses/hyp_f899791c034ef7ef.json`](data/artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/hypotheses/hyp_f899791c034ef7ef.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSG6GM275W3TKGG6ETH9V53X/bench/bnc_01KSG6GM23ERB68V6BCF9XBS2B.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSG6GM23ERB68V6BCF9XBS2B';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSG6GM23ERB68V6BCF9XBS2B';
+```
+
+<a id="bench-bnc_01ksg7agxvxbv5xszq3g7nafq9"></a>
+## Bench `bnc_01KSG7AGXVXBV5XSZQ3G7NAFQ9`
+
+- **Created:** 2026-05-25T18:45:58.334490+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.2660
+- **Matches played:** 0
+- **Session:** `ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR`
+- **Bench artifact:** `artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/bench/bnc_01KSG7AGXVXBV5XSZQ3G7NAFQ9.json`
+
+**Goal:**
+
+> Identify two promising hypotheses about microbiome-driven inflammation
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `claude-haiku-4.5` | pipeline | 1 | — | 1200 | 0/— | $0.2068 | 81.5s |  |
+| `gemini-2-flash-thinking` | pipeline | 1 | — | 1200 | 0/— | $0.0121 | 27.3s |  |
+| `gemini-2-pro` | pipeline | 1 | — | 1200 | 0/— | $0.0471 | 40.9s |  |
+| `openai-o1` | pipeline | 0 | — | — | 0/— | $0.0000 | — |  |
+
+### Hypotheses surfaced (3 total)
+
+- **Microbiome-Inflammation Axis in HIV-Associated Cardiovascular Disease** — via _(no match table entry)_
+  - Specific gut microbiome dysbiosis in HIV-infected individuals promotes systemic inflammation, contributing to increased subclinical cardiovascular disease risk.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/hypotheses/hyp_73af166cd168c32b.json`](data/artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/hypotheses/hyp_73af166cd168c32b.json)
+- **Progressive Loss of SCFA-Mediated Immune Tolerance in Dysbiosis-Driven Inflammation** — via _(no match table entry)_
+  - Dysbiosis-driven inflammation progresses through a stage-specific cascade in which sequential depletion of SCFA-producing bacteria (Faecalibacterium prausnitzii, Roseburia, Clostridium clusters) progressively diminishes butyrate-dependent F
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/hypotheses/hyp_84f3ac53779b3f4c.json`](data/artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/hypotheses/hyp_84f3ac53779b3f4c.json)
+- **Temporal Dysregulation in Peyer's Patches as a Driver of AIEC-Mediated Inflammation** — via _(no match table entry)_
+  - Antibiotic-induced disruption of circadian immune rhythms in Peyer's patch-associated microbiome niches creates a permissive window for Adherent-Invasive E. coli (AIEC) colonization, which in turn establishes a persistent, localized inflamm
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/hypotheses/hyp_ad96328d18db9617.json`](data/artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/hypotheses/hyp_ad96328d18db9617.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSG7AGXZDEEGEZ1VM0ZFPMJR/bench/bnc_01KSG7AGXVXBV5XSZQ3G7NAFQ9.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSG7AGXVXBV5XSZQ3G7NAFQ9';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSG7AGXVXBV5XSZQ3G7NAFQ9';
+```
+
+<a id="bench-bnc_01ksg7hm47116412h3nv3vkdf8"></a>
+## Bench `bnc_01KSG7HM47116412H3NV3VKDF8`
+
+- **Created:** 2026-05-25T18:49:50.985049+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.4032
+- **Matches played:** 12
+- **Session:** `ses_01KSG7HM49E7Q77K0WN5GN28TN`
+- **Bench artifact:** `artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/bench/bnc_01KSG7HM47116412H3NV3VKDF8.json`
+
+**Goal:**
+
+> Identify two promising hypotheses about microbiome-driven inflammation
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `gemini-2-flash-thinking` | pipeline | 1 | 6-0 | 1284 | 0/— | $0.0026 | 35.2s |  |
+| `gemini-2-pro` | pipeline | 1 | 4-2 | 1229 | 0/— | $0.0342 | 26.6s |  |
+| `openai-o1` | pipeline | 1 | 2-4 | 1165 | 0/— | $0.2326 | 28.7s |  |
+| `claude-haiku-4.5` | pipeline | 1 | 0-6 | 1123 | 0/— | $0.1338 | 71.3s |  |
+
+### Hypotheses surfaced (4 total)
+
+- **Targeting Oscillibacter valericigenes to reduce adipose inflammation in metabolic syndrome** — via `openai-o1 (pipeline)`
+  - Selective suppression of Oscillibacter valericigenes in the gut microbiota decreases macrophage-mediated adipose tissue inflammation and mitigates diet-induced metabolic syndrome.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/hypotheses/hyp_38b1964d15cad8b3.json`](data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/hypotheses/hyp_38b1964d15cad8b3.json)
+- **Microbiome-derived pro-inflammatory lipids and asthma exacerbation** — via `gemini-2-flash-thinking (pipeline)`
+  - Specific gut microbes exacerbate asthma by producing pro-inflammatory lipid mediators such as 12,13-diHOME, which translocate to the lungs via the gut-lung axis, promoting airway inflammation.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/hypotheses/hyp_b4fac88683f2face.json`](data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/hypotheses/hyp_b4fac88683f2face.json)
+- **Synergistic bacterial protection against allergic lung inflammation** — via `gemini-2-pro (pipeline)`
+  - The synergistic action of gut commensals Akkermansia muciniphila and Parabacteroides distasonis ameliorates allergic lung inflammation by enhancing the gut-lung axis.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/hypotheses/hyp_bec78dba6ec909fb.json`](data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/hypotheses/hyp_bec78dba6ec909fb.json)
+- **Dysbiosis-driven barrier dysfunction and LPS translocation cascade** — via `claude-haiku-4.5 (pipeline)`
+  - Dysbiosis-driven dysregulation of tight junction protein expression and epithelial integrity enables increased translocation of lipopolysaccharide (LPS) from gram-negative bacteria, which activates TLR4/NF-κB signaling in macrophages and en
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/hypotheses/hyp_ca7310d1ef4a17e5.json`](data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/hypotheses/hyp_ca7310d1ef4a17e5.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSG7HM49E7Q77K0WN5GN28TN/bench/bnc_01KSG7HM47116412H3NV3VKDF8.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSG7HM47116412H3NV3VKDF8';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSG7HM47116412H3NV3VKDF8';
+```
+
+<a id="bench-bnc_01ksgcewxms7t3m3fjsa9g1k5t"></a>
+## Bench `bnc_01KSGCEWXMS7T3M3FJSA9G1K5T`
+
+- **Created:** 2026-05-25T20:15:44.568652+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0372
+- **Matches played:** 0
+- **Session:** `ses_01KSGCEWXS9H04GHGNRJR9D790`
+- **Bench artifact:** `artifacts/ses_01KSGCEWXS9H04GHGNRJR9D790/bench/bnc_01KSGCEWXMS7T3M3FJSA9G1K5T.json`
+
+**Goal:**
+
+> Identify FDA-approved drugs that could be repurposed for AML; name specific drugs, mechanisms, and an experiment.
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash3-pipe` | pipeline | 1 | — | 1200 | 0/— | $0.0164 | 12.5s |  |
+| `flash3-raw` | pipeline | 1 | — | 1200 | 0/— | $0.0208 | 14.3s |  |
+
+### Hypotheses surfaced (2 total)
+
+- **Repurposing Thioridazine to Target Leukemic Stem Cells in AML via Dopamine Receptor Antagonism** — via _(no match table entry)_
+  - The FDA-approved antipsychotic thioridazine can be repurposed for Acute Myeloid Leukemia (AML) by selectively eliminating leukemic stem cells (LSCs) through the antagonism of overexpressed dopamine receptors D2 and D4.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCEWXS9H04GHGNRJR9D790/hypotheses/hyp_25b09255f880e4a3.json`](data/artifacts/ses_01KSGCEWXS9H04GHGNRJR9D790/hypotheses/hyp_25b09255f880e4a3.json)
+- **Repurposing Selinexor to Overcome Venetoclax Resistance in Monocytic AML via MCL-1 Suppression** — via _(no match table entry)_
+  - The combination of the XPO1 inhibitor selinexor and the BCL-2 inhibitor venetoclax will synergistically overcome therapeutic resistance in monocytic and relapsed/refractory AML by modulating the p53-NF-κB axis to downregulate MCL-1 expressi
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCEWXS9H04GHGNRJR9D790/hypotheses/hyp_29e3a8e0dd33eedd.json`](data/artifacts/ses_01KSGCEWXS9H04GHGNRJR9D790/hypotheses/hyp_29e3a8e0dd33eedd.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGCEWXS9H04GHGNRJR9D790/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGCEWXS9H04GHGNRJR9D790/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGCEWXS9H04GHGNRJR9D790/bench/bnc_01KSGCEWXMS7T3M3FJSA9G1K5T.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGCEWXMS7T3M3FJSA9G1K5T';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGCEWXMS7T3M3FJSA9G1K5T';
+```
+
+<a id="bench-bnc_01ksgchan1348m7wedx9e449nd"></a>
+## Bench `bnc_01KSGCHAN1348M7WEDX9E449ND`
+
+- **Created:** 2026-05-25T20:17:04.163262+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0099
+- **Matches played:** 0
+- **Session:** `ses_01KSGCHAN3MC0Z484E97C3WWEW`
+- **Bench artifact:** `artifacts/ses_01KSGCHAN3MC0Z484E97C3WWEW/bench/bnc_01KSGCHAN1348M7WEDX9E449ND.json`
+
+**Goal:**
+
+> Identify FDA-approved drugs that could be repurposed for AML. Name a specific drug INN/brand, the mechanism in AML, and a concrete experiment.
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash25-raw` | direct | 0 | — | — | 0/— | $0.0000 | — | 1 validation error for Task
+action
+  Input should be 'Create |
+| `flash3-pipe` | pipeline | 0 | — | — | 0/— | $0.0099 | — |  |
+| `flash3-raw` | direct | 0 | — | — | 0/— | $0.0000 | — | 1 validation error for Task
+action
+  Input should be 'Create |
+
+_No hypotheses produced (every candidate failed)._
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGCHAN3MC0Z484E97C3WWEW/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGCHAN3MC0Z484E97C3WWEW/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGCHAN3MC0Z484E97C3WWEW/bench/bnc_01KSGCHAN1348M7WEDX9E449ND.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGCHAN1348M7WEDX9E449ND';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGCHAN1348M7WEDX9E449ND';
+```
+
+<a id="bench-bnc_01ksgcjsn8mgmk6h3kzvvqzjpg"></a>
+## Bench `bnc_01KSGCJSN8MGMK6H3KZVVQZJPG`
+
+- **Created:** 2026-05-25T20:17:52.298818+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.0189
+- **Matches played:** 2
+- **Session:** `ses_01KSGCJSNBQA3C0Y09736DSJVW`
+- **Bench artifact:** `artifacts/ses_01KSGCJSNBQA3C0Y09736DSJVW/bench/bnc_01KSGCJSN8MGMK6H3KZVVQZJPG.json`
+
+**Goal:**
+
+> Identify FDA-approved drugs that could be repurposed for AML. Name a specific drug INN/brand, the mechanism in AML, and a concrete experiment.
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash3-pipe` | pipeline | 1 | 2-0 | 1231 | 0/— | $0.0174 | 12.9s |  |
+| `flash3-raw` | direct | 1 | 0-2 | 1169 | 0/— | $0.0015 | 4.2s |  |
+
+### Hypotheses surfaced (2 total)
+
+- **Mifepristone Repurposing for FLT3-ITD Positive AML** — via `flash3-raw (direct)`
+  - Mifepristone (RU486) inhibits the growth of FLT3-ITD mutated Acute Myeloid Leukemia by antagonizing the glucocorticoid receptor-mediated survival signaling and inducing apoptosis.
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGCJSNBQA3C0Y09736DSJVW/hypotheses/hyp_a37e3de6b24daa2b.json`](data/artifacts/ses_01KSGCJSNBQA3C0Y09736DSJVW/hypotheses/hyp_a37e3de6b24daa2b.json)
+- **Repurposing Salicylanilide Anthelmintics to Target the MLL-MYB-OXPHOS Nexus in AML LSCs** — via `flash3-pipe (pipeline)`
+  - The FDA-approved anthelmintics Niclosamide and Bithionol can be repurposed to eradicate AML Leukemia Stem Cells (LSCs) by inducing the simultaneous depletion of MLL-fusion proteins and the c-MYB transcription factor, thereby sensitizing res
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCJSNBQA3C0Y09736DSJVW/hypotheses/hyp_d577dce14a8b60fd.json`](data/artifacts/ses_01KSGCJSNBQA3C0Y09736DSJVW/hypotheses/hyp_d577dce14a8b60fd.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGCJSNBQA3C0Y09736DSJVW/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGCJSNBQA3C0Y09736DSJVW/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGCJSNBQA3C0Y09736DSJVW/bench/bnc_01KSGCJSN8MGMK6H3KZVVQZJPG.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGCJSN8MGMK6H3KZVVQZJPG';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGCJSN8MGMK6H3KZVVQZJPG';
+```
+
+<a id="bench-bnc_01ksgcksg3mjkvpdzbzxm3th2g"></a>
+## Bench `bnc_01KSGCKSG3MJKVPDZBZXM3TH2G`
+
+- **Created:** 2026-05-25T20:18:24.903406+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `aml-repurposing-paper-5` (size 5)
+- **Total cost:** $0.9852
+- **Matches played:** 6
+- **Session:** `ses_01KSGCKSG89DHGN780150HFR4C`
+- **Bench artifact:** `artifacts/ses_01KSGCKSG89DHGN780150HFR4C/bench/bnc_01KSGCKSG3MJKVPDZBZXM3TH2G.json`
+
+**Goal:**
+
+> Identify FDA-approved drugs that could be repurposed as therapeutic candidates for acute myeloid leukemia (AML). For each hypothesis, name the specific approved drug (its INN or brand name), describe the molecular mechanism by which it would act against AML blasts or leukemic stem cells, and propose a concrete in vitro or in vivo experiment to test it.
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `claude-haiku-4.5` | pipeline | 2 | 3-0 | 1224 | 0/5 | $0.3922 | 54.1s |  |
+| `openai-o1` | pipeline | 2 | 2-1 | 1208 | 0/5 | $0.5341 | 19.3s |  |
+| `gemini-2-pro` | pipeline | 2 | 1-2 | 1192 | 0/5 | $0.0540 | 29.1s |  |
+| `gemini-2-flash-thinking` | pipeline | 2 | 0-3 | 1176 | 0/5 | $0.0049 | 10.6s |  |
+
+### Hypotheses surfaced (8 total)
+
+- **Trifluoperazine-mediated ferroptosis induction in AML** — via `openai-o1 (pipeline)`
+  - We hypothesize that the FDA-approved antipsychotic trifluoperazine can be repurposed to selectively induce ferroptosis in AML blasts and leukemic stem cells by targeting the Nrf2/SLC7A11/GPX4 antioxidant axis.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_282added778413c0.json`](data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_282added778413c0.json)
+- **Belumosudil for AML** — via `gemini-2-flash-thinking (pipeline)`
+  - Belumosudil, an FDA-approved ROCK2 inhibitor, can inhibit the proliferation and promote the differentiation of AML blasts and leukemic stem cells.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_b9ecde9089d61997.json`](data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_b9ecde9089d61997.json)
+- **Metformin-induced ferroptosis in IDH2-/FLT3-mutant AML** — via `openai-o1 (pipeline)`
+  - We hypothesize that repurposing metformin, an FDA-approved antidiabetic drug, will induce ferroptosis and suppress AML blasts, especially IDH2-/FLT3-mutant subtypes, by impairing oxidative phosphorylation and driving lipid metabolic remodel
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_ca4b9050f7f3e680.json`](data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_ca4b9050f7f3e680.json)
+- **Itraconazole for AML by Targeting OXPHOS** — via `gemini-2-pro (pipeline)`
+  - Itraconazole, an FDA-approved antifungal drug, can be repurposed as a therapeutic agent for Acute Myeloid Leukemia (AML) by targeting mitochondrial oxidative phosphorylation in leukemic cells.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_cdedf3366cef4a73.json`](data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_cdedf3366cef4a73.json)
+- **Itraconazole-mediated OXPHOS inhibition targets therapy-resistant AML leukemic stem cells** — via `claude-haiku-4.5 (pipeline)`
+  - Itraconazole, an FDA-approved azole antifungal targeting CYP51A1, inhibits mitochondrial electron transport chain complex I activity to suppress oxidative phosphorylation and selectively eradicate therapy-resistant leukemic stem cells in AM
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_d6232451243be7b2.json`](data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_d6232451243be7b2.json)
+- **Itraconazole as a repurposed therapeutic for acute myeloid leukemia.** — via _(no match table entry)_
+  - The FDA-approved antifungal drug itraconazole can be repurposed for the treatment of acute myeloid leukemia (AML) by targeting leukemic stem cells.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_d75698c7976be57f.json`](data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_d75698c7976be57f.json)
+- **Cabozantinib for FLT3-ITD AML** — via `gemini-2-flash-thinking (pipeline)`
+  - Cabozantinib can be repurposed for the treatment of FLT3-ITD positive acute myeloid leukemia.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_eaeca72f89d53fdb.json`](data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_eaeca72f89d53fdb.json)
+- **Itraconazole as OXPHOS inhibitor for AML LSC targeting** — via `claude-haiku-4.5 (pipeline)`
+  - Itraconazole, an FDA-approved azole antifungal, can be repurposed to selectively eradicate therapy-resistant leukemic stem cells in AML by inhibiting CYP51A1-dependent electron transport chain complex I activity, thereby suppressing oxidati
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_ee162a788222e25e.json`](data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/hyp_ee162a788222e25e.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGCKSG89DHGN780150HFR4C/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGCKSG89DHGN780150HFR4C/bench/bnc_01KSGCKSG3MJKVPDZBZXM3TH2G.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGCKSG3MJKVPDZBZXM3TH2G';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGCKSG3MJKVPDZBZXM3TH2G';
+```
+
+<a id="bench-bnc_01ksgctx88hhp929v9ae1cgqrv"></a>
+## Bench `bnc_01KSGCTX88HHP929V9AE1CGQRV`
+
+- **Created:** 2026-05-25T20:22:18.123732+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `aml-repurposing-paper-5` (size 5)
+- **Total cost:** $0.6977
+- **Matches played:** 1
+- **Session:** `ses_01KSGCTX8CNW1TR6TG25AEHCPK`
+- **Bench artifact:** `artifacts/ses_01KSGCTX8CNW1TR6TG25AEHCPK/bench/bnc_01KSGCTX88HHP929V9AE1CGQRV.json`
+
+**Goal:**
+
+> Identify FDA-approved drugs that could be repurposed as therapeutic candidates for acute myeloid leukemia (AML). For each hypothesis, name the specific approved drug (its INN or brand name), describe the molecular mechanism by which it would act against AML blasts or leukemic stem cells, and propose a concrete in vitro or in vivo experiment to test it.
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `claude-opus-4.7[raw]` | direct | 1 | 1-0 | 1216 | 0/5 | $0.1716 | 31.1s |  |
+| `gemini-3-flash[raw]` | direct | 1 | 0-1 | 1184 | 0/5 | $0.0017 | 7.7s |  |
+| `claude-opus-4.7[pipe]` | pipeline | 0 | — | — | 0/5 | $0.1427 | — |  |
+| `gemini-3-flash[pipe]` | pipeline | 0 | — | — | 0/5 | $0.0105 | — |  |
+| `gemini-3-pro[pipe]` | pipeline | 0 | — | — | 0/5 | $0.0567 | — |  |
+| `gemini-3-pro[raw]` | direct | 0 | — | — | 0/5 | $0.0178 | 41.0s |  |
+| `gpt-5[pipe]` | pipeline | 0 | — | — | 0/5 | $0.2125 | — |  |
+| `gpt-5[raw]` | direct | 0 | — | — | 0/5 | $0.0842 | 108.7s |  |
+
+### Hypotheses surfaced (2 total)
+
+- **Auranofin repurposing for AML via TXNRD1 inhibition and ferroptosis induction in leukemic stem cells** — via `claude-opus-4.7 (direct)`
+  - The FDA-approved anti-rheumatic gold(I) drug auranofin can be repurposed to selectively kill AML blasts and leukemic stem cells (LSCs) by inhibiting thioredoxin reductase 1 (TXNRD1), collapsing the thioredoxin/glutathione antioxidant axis, 
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGCTX8CNW1TR6TG25AEHCPK/hypotheses/hyp_69dc310a3799c52b.json`](data/artifacts/ses_01KSGCTX8CNW1TR6TG25AEHCPK/hypotheses/hyp_69dc310a3799c52b.json)
+- **Repurposing Ponatinib as a PRMT5 Inhibitor for Acute Myeloid Leukemia Therapy** — via `gemini-3-flash (direct)`
+  - Ponatinib can be repurposed as a therapeutic for AML by acts as an epigenetic modulator through the inhibition of PRMT5, thereby restoring the p53 tumor suppressor pathway.
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGCTX8CNW1TR6TG25AEHCPK/hypotheses/hyp_cc06ee3760501927.json`](data/artifacts/ses_01KSGCTX8CNW1TR6TG25AEHCPK/hypotheses/hyp_cc06ee3760501927.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGCTX8CNW1TR6TG25AEHCPK/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGCTX8CNW1TR6TG25AEHCPK/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGCTX8CNW1TR6TG25AEHCPK/bench/bnc_01KSGCTX88HHP929V9AE1CGQRV.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGCTX88HHP929V9AE1CGQRV';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGCTX88HHP929V9AE1CGQRV';
+```
+
+<a id="bench-bnc_01ksgd0wkfyaf2x15p99bfax01"></a>
+## Bench `bnc_01KSGD0WKFYAF2X15P99BFAX01`
+
+- **Created:** 2026-05-25T20:25:34.067046+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `(none)`
+- **Total cost:** $0.1452
+- **Matches played:** 12
+- **Session:** `ses_01KSGD0WKK7XZC5H4BBZT0QX6K`
+- **Bench artifact:** `artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/bench/bnc_01KSGD0WKFYAF2X15P99BFAX01.json`
+
+**Goal:**
+
+> Identify FDA-approved drugs that could be repurposed for AML. For each hypothesis, name a specific approved drug (INN/brand), describe the molecular mechanism in AML, and propose a concrete experiment.
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `flash3-pipe` | pipeline | 1 | 4-2 | 1234 | 0/— | $0.0275 | 14.9s |  |
+| `flash3-raw` | direct | 2 | 5-1 | 1228 | 0/— | $0.0033 | 5.0s |  |
+| `gpt4o-pipe` | pipeline | 1 | 3-3 | 1201 | 0/— | $0.1040 | 18.5s |  |
+| `gpt4o-raw` | direct | 2 | 0-6 | 1154 | 0/— | $0.0105 | 3.7s |  |
+
+### Hypotheses surfaced (6 total)
+
+- **Repurposing Arsenic Trioxide for Targeting p53 Mutations in AML** — via `gpt4o-pipe (pipeline)`
+  - Arsenic Trioxide (ATO) can be repurposed to target and rescue structural p53 mutations in AML, thereby restoring its tumor suppressor function and inducing apoptosis in malignant cells.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_58d446efd9c70dd2.json`](data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_58d446efd9c70dd2.json)
+- **Auranofin Repurposing for AML via Thioredoxin Reductase Inhibition** — via `flash3-raw (direct)`
+  - Auranofin induces selective apoptosis in acute myeloid leukemia (AML) cells by irreversibly inhibiting thioredoxin reductase 1 (TXNRD1), thereby overwhelming the cell's antioxidant capacity and triggering ROS-mediated programmed cell death.
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_7a8cb45f9aab9603.json`](data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_7a8cb45f9aab9603.json)
+- **Repurposing Venetoclax for AML targeting BCL-2** — via `gpt4o-raw (direct)`
+  - Venetoclax could be repurposed to treat Acute Myeloid Leukemia (AML) by targeting the anti-apoptotic protein BCL-2, leading to increased apoptosis of AML cells.
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_80a4bdeff205988e.json`](data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_80a4bdeff205988e.json)
+- **Repurposing Pimavanserin for FLT3-ITD Acute Myeloid Leukemia via 5-HT2AR Antagonism** — via `flash3-raw (direct)`
+  - Pimavanserin (Nuplazid) inhibits AML progression by acting as an inverse agonist of the 5-HT2A receptor, thereby suppressing the hyperactivated STAT5 and AKT signaling pathways in FLT3-ITD-positive leukemic cells.
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_97551af04eee3997.json`](data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_97551af04eee3997.json)
+- **Repurposing Itraconazole to Overcome Venetoclax Resistance in AML via Mitochondrial Complex I Inhibition** — via `flash3-pipe (pipeline)`
+  - The FDA-approved antifungal Itraconazole sensitizes Acute Myeloid Leukemia (AML) cells and leukemic stem cells to Venetoclax by inhibiting CYP51A1-dependent mitochondrial Complex I activity, thereby disrupting the metabolic compensatory hig
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_af38040d776d69f1.json`](data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_af38040d776d69f1.json)
+- **Repurposing Bosutinib for AML Treatment** — via `gpt4o-raw (direct)`
+  - Bosutinib, a tyrosine kinase inhibitor, can be repurposed to treat acute myeloid leukemia by inhibiting abnormal signaling pathways.
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_b552ad85a384e282.json`](data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/hyp_b552ad85a384e282.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGD0WKK7XZC5H4BBZT0QX6K/bench/bnc_01KSGD0WKFYAF2X15P99BFAX01.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGD0WKFYAF2X15P99BFAX01';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGD0WKFYAF2X15P99BFAX01';
+```
+
+<a id="bench-bnc_01ksgv99yg7d4dxz8g6pejwkv1"></a>
+## Bench `bnc_01KSGV99YG7D4DXZ8G6PEJWKV1`
+
+- **Created:** 2026-05-26T00:34:49.940013+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `aml-repurposing-paper-5` (size 5)
+- **Total cost:** $0.0000
+- **Matches played:** 0
+- **Session:** `ses_01KSGV99YMT4S6605JKT61P244`
+- **Bench artifact:** `artifacts/ses_01KSGV99YMT4S6605JKT61P244/bench/bnc_01KSGV99YG7D4DXZ8G6PEJWKV1.json`
+
+**Goal:**
+
+> Produce a ranked list of drug repurposing candidates for acute myeloid leukemia (AML), strictly under the following constraints:  (1) Each candidate must NOT have prior published evidence of being repurposed for AML, and there must be no preclinical studies in AML for the proposed compound at the time of writing. (2) Use only your internal knowledge. Do NOT assume access to DepMap dependency scores, gene-essentiality datasets, transcriptomic screens, or human expert curation. No external inputs. (3) Name the specific compound (INN, brand name, or research-code alias) — do not propose generic d…
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `claude-haiku-4.5` | pipeline | 0 | — | — | 0/5 | $0.0000 | — |  |
+| `gemini-2-flash-thinking` | pipeline | 0 | — | — | 0/5 | $0.0000 | — |  |
+| `gemini-2-pro` | pipeline | 0 | — | — | 0/5 | $0.0000 | — |  |
+| `openai-o1` | pipeline | 0 | — | — | 0/5 | $0.0000 | — |  |
+
+_No hypotheses produced (every candidate failed)._
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGV99YMT4S6605JKT61P244/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGV99YMT4S6605JKT61P244/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGV99YMT4S6605JKT61P244/bench/bnc_01KSGV99YG7D4DXZ8G6PEJWKV1.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGV99YG7D4DXZ8G6PEJWKV1';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGV99YG7D4DXZ8G6PEJWKV1';
+```
+
+<a id="bench-bnc_01ksgvhy16q0ghne9zjwzygfng"></a>
+## Bench `bnc_01KSGVHY16Q0GHNE9ZJWZYGFNG`
+
+- **Created:** 2026-05-26T00:39:32.649554+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `aml-repurposing-paper-top3` (size 3)
+- **Total cost:** $1.8881
+- **Matches played:** 6
+- **Session:** `ses_01KSGVHY1A3Q59WY2RWXP37J4D`
+- **Bench artifact:** `artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/bench/bnc_01KSGVHY16Q0GHNE9ZJWZYGFNG.json`
+
+**Goal:**
+
+> Produce a ranked list of drug repurposing candidates for acute myeloid leukemia (AML), strictly under the following constraints:  (1) Each candidate must NOT have prior published evidence of being repurposed for AML, and there must be no preclinical studies in AML for the proposed compound at the time of writing. (2) Use only your internal knowledge. Do NOT assume access to DepMap dependency scores, gene-essentiality datasets, transcriptomic screens, or human expert curation. No external inputs. (3) Name the specific compound (INN, brand name, or research-code alias) — do not propose generic d…
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `openai-o1` | pipeline | 2 | 2-2 | 1201 | 0/3 | $1.1566 | 30.9s |  |
+| `gemini-2-flash-thinking` | pipeline | 2 | 2-2 | 1199 | 0/3 | $0.0015 | 7.9s |  |
+| `gemini-2-pro` | pipeline | 1 | 2-2 | 1199 | 0/3 | $0.1540 | 31.1s |  |
+| `claude-haiku-4.5` | pipeline | 0 | — | — | 0/3 | $0.5760 | — |  |
+
+### Hypotheses surfaced (5 total)
+
+- **Riluzole-induced redox disruption as a novel AML therapy** — via `openai-o1 (pipeline)`
+  - We hypothesize that Riluzole’s blockade of glutamate release and subsequent reduction of cystine uptake can selectively induce oxidative stress and apoptosis in acute myeloid leukemia cells.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_02bd0ee28ba70b71.json`](data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_02bd0ee28ba70b71.json)
+- **Carglumic Acid for the Treatment of Acute Myeloid Leukemia** — via `gemini-2-pro (pipeline)`
+  - Carglumic acid, an FDA-approved drug for hyperammonemia, can be repurposed to treat Acute Myeloid Leukemia (AML) by inhibiting pyrimidine biosynthesis in leukemic cells.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_18395516265ebfe4.json`](data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_18395516265ebfe4.json)
+- **Auranofin as TrxR inhibitor in AML** — via `gemini-2-flash-thinking (pipeline)`
+  - Auranofin, an inhibitor of thioredoxin reductase (TrxR), can induce oxidative stress and apoptosis in AML cells, including leukemic stem cells.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_66bf74de0f5a57b8.json`](data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_66bf74de0f5a57b8.json)
+- **Targeting SRPK1 in AML with Seclidemstat** — via `gemini-2-flash-thinking (pipeline)`
+  - Seclidemstat, an investigational lysine-specific histone demethylase 1A (LSD1) inhibitor, can be repurposed to treat acute myeloid leukemia (AML) by inhibiting serine/arginine-rich protein kinase 1 (SRPK1), thereby disrupting RNA splicing a
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_753d9069756fc70f.json`](data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_753d9069756fc70f.json)
+- **Teprotumumab Repurposing for AML via IGF1R Blockade** — via `openai-o1 (pipeline)`
+  - Teprotumumab, an IGF1R monoclonal antibody originally developed for thyroid eye disease, can disrupt survival signals in AML blasts and leukemic stem cells by blocking the IGF-1 growth pathway.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_d8b68f4010144129.json`](data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/hyp_d8b68f4010144129.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGVHY1A3Q59WY2RWXP37J4D/bench/bnc_01KSGVHY16Q0GHNE9ZJWZYGFNG.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGVHY16Q0GHNE9ZJWZYGFNG';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGVHY16Q0GHNE9ZJWZYGFNG';
+```
+
+<a id="bench-bnc_01ksgvrbbdnfb8mzyqzd30p180"></a>
+## Bench `bnc_01KSGVRBBDNFB8MZYQZD30P180`
+
+- **Created:** 2026-05-26T00:43:02.896405+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `aml-repurposing-paper-top3` (size 3)
+- **Total cost:** $0.8730
+- **Matches played:** 15
+- **Session:** `ses_01KSGVRBBHVQ1T88ABA0TV5071`
+- **Bench artifact:** `artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/bench/bnc_01KSGVRBBDNFB8MZYQZD30P180.json`
+
+**Goal:**
+
+> Produce a ranked list of drug repurposing candidates for acute myeloid leukemia (AML), strictly under the following constraints:  (1) Each candidate must NOT have prior published evidence of being repurposed for AML, and there must be no preclinical studies in AML for the proposed compound at the time of writing. (2) Use only your internal knowledge. Do NOT assume access to DepMap dependency scores, gene-essentiality datasets, transcriptomic screens, or human expert curation. No external inputs. (3) Name the specific compound (INN, brand name, or research-code alias) — do not propose generic d…
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `gemini-2-pro[raw]` | direct | 1 | 5-0 | 1274 | 0/3 | $0.0373 | 35.5s |  |
+| `claude-haiku-4.5[raw]` | direct | 1 | 4-1 | 1244 | 0/3 | $0.0073 | 9.3s |  |
+| `openai-o1[raw]` | direct | 1 | 3-2 | 1213 | 0/3 | $0.2810 | 24.5s |  |
+| `gemini-2-flash-thinking[pipe]` | pipeline | 1 | 2-3 | 1183 | 0/3 | $0.0004 | 5.2s |  |
+| `gemini-2-flash-thinking[raw]` | direct | 1 | 1-4 | 1158 | 0/3 | $0.0002 | 3.5s |  |
+| `openai-o1[pipe]` | pipeline | 1 | 0-5 | 1128 | 0/3 | $0.4047 | 36.7s |  |
+| `claude-haiku-4.5[pipe]` | pipeline | 0 | — | — | 0/3 | $0.1237 | — |  |
+| `gemini-2-pro[pipe]` | pipeline | 0 | — | — | 0/3 | $0.0185 | — |  |
+
+### Hypotheses surfaced (6 total)
+
+- **Repurposing of the RORγ Inverse Agonist GSK2981278 for AML Therapy** — via `gemini-2-pro (direct)`
+  - The selective RORγ inverse agonist GSK2981278, developed for autoimmune diseases, will suppress leukemic growth and eradicate leukemic stem cells in acute myeloid leukemia (AML) by inhibiting the pro-leukemic transcriptional program maintai
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_44905531e46987fd.json`](data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_44905531e46987fd.json)
+- **Roflumilast (a PDE4 inhibitor) as a novel anti-AML agent via cAMP-mediated apoptosis** — via `openai-o1 (direct)`
+  - We hypothesize that roflumilast-mediated PDE4 inhibition disrupts AML blast proliferation and survival by elevating intracellular cAMP levels and triggering apoptosis-driven cell death, despite no prior preclinical AML data for roflumilast.
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_7ce60187976ce979.json`](data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_7ce60187976ce979.json)
+- **Repurposing sodium phenylbutyrate for AML via epigenetic modulation** — via `gemini-2-flash-thinking (direct)`
+  - Sodium phenylbutyrate will inhibit HDAC activity in AML cells, leading to increased histone acetylation, cell cycle arrest, and apoptosis.
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_aa132a34ec15ef6a.json`](data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_aa132a34ec15ef6a.json)
+- **Manidipine for AML** — via `gemini-2-flash-thinking (pipeline)`
+  - Manidipine, a calcium channel blocker, can inhibit AML cell proliferation by disrupting calcium signaling.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_b934f75a47913ebd.json`](data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_b934f75a47913ebd.json)
+- **Ezetimibe as a novel anti-AML agent** — via `openai-o1 (pipeline)`
+  - Ezetimibe’s inhibition of cholesterol absorption diminishes AML blast growth by limiting essential cholesterol supply.
+  - mode: `pipeline` · artifact: [`data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_c8f69611471fa13a.json`](data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_c8f69611471fa13a.json)
+- **Repurposing Finerenone for AML via aldosterone-independent FGFR4 inhibition** — via `claude-haiku-4.5 (direct)`
+  - Finerenone, a non-steroidal mineralocorticoid receptor antagonist approved for diabetic kidney disease, will show efficacy against AML blasts through off-target inhibition of FGFR4 signaling, which is constitutively active in AML cells and 
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_fabac9462da8b5c1.json`](data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/hyp_fabac9462da8b5c1.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- · `aml-repurposing-paper-5` (5 entities): **0/5** → _none_
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGVRBBHVQ1T88ABA0TV5071/bench/bnc_01KSGVRBBDNFB8MZYQZD30P180.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGVRBBDNFB8MZYQZD30P180';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGVRBBDNFB8MZYQZD30P180';
+```
+
+<a id="bench-bnc_01ksgw0h3kh2ctgv4jctwc63v1"></a>
+## Bench `bnc_01KSGW0H3KH2CTGV4JCTWC63V1`
+
+- **Created:** 2026-05-26T00:47:30.935262+00:00
+- **Status:** done
+- **Judge:** `openrouter:google/gemini-3-flash-preview`
+- **Gold set at runtime:** `aml-repurposing-paper-top3` (size 3)
+- **Total cost:** $1.8255
+- **Matches played:** 1
+- **Session:** `ses_01KSGW0H3QK5QC2ZEJRNN31JM2`
+- **Bench artifact:** `artifacts/ses_01KSGW0H3QK5QC2ZEJRNN31JM2/bench/bnc_01KSGW0H3KH2CTGV4JCTWC63V1.json`
+
+**Goal:**
+
+> Produce a ranked list of drug repurposing candidates for acute myeloid leukemia (AML), strictly under the following constraints:  (1) Each candidate must NOT have prior published evidence of being repurposed for AML, and there must be no preclinical studies in AML for the proposed compound at the time of writing. (2) Use only your internal knowledge. Do NOT assume access to DepMap dependency scores, gene-essentiality datasets, transcriptomic screens, or human expert curation. No external inputs. (3) Name the specific compound (INN, brand name, or research-code alias) — do not propose generic d…
+
+### Candidates
+
+| label | mode | n_hyps | W-L | Elo | hits (runtime) | $ | p50 | note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `claude-opus-4.7[raw]` | direct | 1 | 1-0 | 1216 | 0/3 | $0.1653 | 30.3s |  |
+| `gemini-3-flash[raw]` | direct | 1 | 0-1 | 1184 | 0/3 | $0.0013 | 3.3s |  |
+| `claude-opus-4.7[pipe]` | pipeline | 0 | — | — | 0/3 | $0.8328 | — |  |
+| `gemini-3-flash[pipe]` | pipeline | 0 | — | — | 0/3 | $0.0018 | — |  |
+| `gemini-3-pro[pipe]` | pipeline | 0 | — | — | 0/3 | $0.1479 | — |  |
+| `gemini-3-pro[raw]` | direct | 0 | — | — | 0/3 | $0.0000 | 151.6s |  |
+| `gpt-5[pipe]` | pipeline | 0 | — | — | 0/3 | $0.4275 | — |  |
+| `gpt-5[raw]` | direct | 0 | — | — | 0/3 | $0.2488 | 154.1s |  |
+
+### Hypotheses surfaced (2 total)
+
+- **Tafenoquine-Induced Mitochondrial Destabilization in AML** — via `gemini-3-flash (direct)`
+  - Tafenoquine selectively induces apoptosis in acute myeloid leukemia cells by disrupting mitochondrial membrane potential and inhibiting oxidative phosphorylation, leveraging the metabolic dependency of leukemic stem cells.
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGW0H3QK5QC2ZEJRNN31JM2/hypotheses/hyp_0c7743b70107976a.json`](data/artifacts/ses_01KSGW0H3QK5QC2ZEJRNN31JM2/hypotheses/hyp_0c7743b70107976a.json)
+- **Pacritinib repurposing for splicing-factor-mutant and MLL-rearranged AML via dual IRAK1/FLT3 blockade** — via `claude-opus-4.7 (direct)`
+  - Pacritinib, an FDA-approved JAK2/FLT3/IRAK1 inhibitor used for myelofibrosis, will selectively kill AML blasts and leukemic stem cells driven by splicing-factor mutations (SF3B1, U2AF1, SRSF2) or MLL-rearrangements via combined suppression 
+  - mode: `direct` · artifact: [`data/artifacts/ses_01KSGW0H3QK5QC2ZEJRNN31JM2/hypotheses/hyp_c046cfa2ad642bfe.json`](data/artifacts/ses_01KSGW0H3QK5QC2ZEJRNN31JM2/hypotheses/hyp_c046cfa2ad642bfe.json)
+
+### Recall across known gold sets (post-hoc rescore)
+
+- ✅ `aml-repurposing-paper-5` (5 entities): **1/5** → Pacritinib
+- · `aml-repurposing-paper-top3` (3 entities): **0/3** → _none_
+
+### Files
+
+- Hypotheses (all `record_hypothesis` payloads): `data/artifacts/ses_01KSGW0H3QK5QC2ZEJRNN31JM2/hypotheses/`
+- LLM transcripts (request + response per call): `data/artifacts/ses_01KSGW0H3QK5QC2ZEJRNN31JM2/transcripts/generation/`
+- Bench summary JSON (per-candidate `gold_hit_detail` with alias / field / hyp): `artifacts/ses_01KSGW0H3QK5QC2ZEJRNN31JM2/bench/bnc_01KSGW0H3KH2CTGV4JCTWC63V1.json`
+
+**SQL to inspect this bench:**
+
+```sql
+-- per-candidate detail
+SELECT label, mode, n_hypotheses, wins, losses,
+       round(mean_elo,0), gold_hits, gold_hit_names,
+       round(total_cost_usd, 4)
+  FROM bench_candidates
+ WHERE bench_id='bnc_01KSGW0H3KH2CTGV4JCTWC63V1';
+
+-- every match with judge rationale
+SELECT bc_a.label, bc_b.label, bm.winner,
+       round(bm.judge_cost_usd, 4),
+       substr(bm.rationale, 1, 200)
+  FROM bench_matches bm
+  JOIN bench_candidates bc_a ON bc_a.id = bm.cand_a
+  JOIN bench_candidates bc_b ON bc_b.id = bm.cand_b
+ WHERE bm.bench_id='bnc_01KSGW0H3KH2CTGV4JCTWC63V1';
+```

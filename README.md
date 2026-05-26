@@ -314,11 +314,21 @@ Note: with small `--n`, recall against either gold set is sensitive to
 luck — the paper surfaced these after running 15 expert-curated goals.
 For comparable numbers raise `--n` to 5+ and run multiple seeds.
 
-#### Recorded results (small-scale runs on this machine)
+#### Recorded results
 
-Three reference benches were run end-to-end on this codebase. Bench IDs
-are stable; load the JSON artifact at
-`data/artifacts/<session_id>/bench/<bench_id>.json` for the full detail.
+Every bench ever run on this codebase — with per-candidate Elo, the
+actual hypotheses each model produced, post-hoc rescore against every
+gold set, and direct file pointers to the artifacts — lives in
+[**`docs/BENCH_RESULTS.md`**](docs/BENCH_RESULTS.md). Regenerate after a
+new run with:
+
+```bash
+python scripts/build_bench_report.py
+```
+
+Three reference benches summarized below. Bench IDs are stable; load the
+JSON artifact at `data/artifacts/<session_id>/bench/<bench_id>.json` for
+full detail.
 
 **1. `paper-aml`** — strict top-3 gold set, paper baselines + Haiku (pipeline mode only)
 
