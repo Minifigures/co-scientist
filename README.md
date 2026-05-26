@@ -314,6 +314,81 @@ Note: with small `--n`, recall against either gold set is sensitive to
 luck — the paper surfaced these after running 15 expert-curated goals.
 For comparable numbers raise `--n` to 5+ and run multiple seeds.
 
+#### Recorded results (small-scale runs on this machine)
+
+Three reference benches were run end-to-end on this codebase. Bench IDs
+are stable; load the JSON artifact at
+`data/artifacts/<session_id>/bench/<bench_id>.json` for the full detail.
+
+**1. `paper-aml`** — strict top-3 gold set, paper baselines + Haiku (pipeline mode only)
+
+| candidate                    | n_hyps | W-L | mean Elo | $ spent |
+| ---                          | ---    | --- | ---      | ---     |
+| openai-o1                    | 2      | 2-2 | 1201     | $1.16   |
+| gemini-2-flash-thinking      | 2      | 2-2 | 1199     | $0.001  |
+| gemini-2-pro                 | 1      | 2-2 | 1199     | $0.154  |
+| claude-haiku-4.5             | 0      | 0-0 | —        | $0.576  |
+
+Total: 6 matches, $1.89. **top-3 hits: 0/3. 5-drug hits: 0/5.**
+Drugs proposed: Riluzole, Carglumic Acid, Auranofin, Seclidemstat,
+Teprotumumab. Most pipeline attempts failed (Haiku tool-loop exhausted
+on all 3; Gemini Pro didn't emit `record_hypothesis` on 2 of 3; o1 hit
+its $1.50 per-candidate cap after 2 calls).
+
+**2. `paper-aml-vs-raw`** — same models × pipeline-or-direct, strict top-3
+
+| candidate                          | n_hyps | W-L | mean Elo | $ spent |
+| ---                                | ---    | --- | ---      | ---     |
+| **gemini-2-pro [direct]**          | 1      | **5-0** | **1274** | $0.037 |
+| **claude-haiku-4.5 [direct]**      | 1      | 4-1 | 1244     | $0.007  |
+| openai-o1 [direct]                 | 1      | 3-2 | 1213     | $0.281  |
+| gemini-2-pro [pipeline]            | 1      | 2-3 | 1183     | $0.0004 |
+| gemini-2-flash-thinking [direct]   | 1      | 1-4 | 1158     | $0.0002 |
+| openai-o1 [pipeline]               | 1      | 0-5 | 1128     | $0.405  |
+| gemini-2-flash-thinking [pipeline] | 0      | —   | —        | $0.018  |
+| claude-haiku-4.5 [pipeline]        | 0      | —   | —        | $0.124  |
+
+Total: 15 matches, $0.87. **top-3 hits: 0/3. 5-drug hits: 0/5.**
+
+Headline result: **direct mode beat pipeline mode for every paper-baseline
+model that produced hypotheses in both modes**. o1's pipeline went **0-5**
+against its own direct. The literature tool-loop appears to hurt these
+older models more than help. Drugs proposed: GSK2981278, Roflumilast,
+Sodium Phenylbutyrate, Manidipine, Ezetimibe, Finerenone.
+
+**3. `frontier-aml-vs-raw`** — current frontier × pipeline-or-direct, strict top-3
+
+| candidate                       | n_hyps | W-L | mean Elo | $ spent | notes |
+| ---                             | ---    | --- | ---      | ---     | ---   |
+| **claude-opus-4.7 [direct]**    | 1      | **1-0** | **1216** | $0.165  | proposed **Pacritinib** |
+| gemini-3-flash [direct]         | 1      | 0-1 | 1184     | $0.001  | proposed Tafenoquine |
+| claude-opus-4.7 [pipeline]      | 0      | —   | —        | $0.833  | session budget exhausted |
+| gpt-5 [pipeline]                | 0      | —   | —        | $0.427  | tool-loop exhausted |
+| gpt-5 [direct]                  | 0      | —   | —        | $0.249  | invalid record (missing fields) |
+| gemini-3-pro [pipeline]         | 0      | —   | —        | $0.148  | tool-loop exhausted |
+| gemini-3-pro [direct]           | 0      | —   | —        | $0.000  | hit max_tokens before tool call |
+| gemini-3-flash [pipeline]       | 0      | —   | —        | $0.002  | tool-loop exhausted |
+
+Total: 1 match, $1.83. **top-3 hits: 0/3. 5-drug hits: 1/5 ✓ Pacritinib**
+(via `anthropic/claude-opus-4.7` in direct mode — the only paper-list hit
+across all three benches). All 4 pipeline modes failed; 3 of 4 direct
+modes either lost or produced unusable output. **Strong frontier models
+need a less constrained prompt + higher budget caps to use the pipeline
+fruitfully.**
+
+#### What these results suggest
+
+- The strict no-prior-evidence + no-DepMap prompt is genuinely hard.
+  Models tend to default to well-known AML repurposing candidates
+  (Auranofin, Itraconazole, Venetoclax — all of which violate the
+  "no prior evidence" constraint).
+- The multi-agent harness adds value *conditional on* the model being
+  able to follow the tool-use protocol. Smaller models (Haiku, Gemini
+  Flash) often fail to complete the loop on this prompt, defaulting
+  to free-text or exhausting the iteration cap.
+- Direct mode is a better baseline than the pipeline for cheap models
+  on this task — useful evidence that the harness's gain is not free.
+
 ### Custom candidates
 
 `label=provider:model[@mode]`. `mode` is `pipeline` (default) or
