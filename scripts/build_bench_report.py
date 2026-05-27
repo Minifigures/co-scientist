@@ -395,12 +395,13 @@ def _headline_findings_section() -> str:
         "**pipeline** (the full Generation harness — literature tools + tool "
         "loop + dedup). Within each bench both modes share one Elo pool, so "
         "the direct→pipeline change is a clean read on what the harness does "
-        "to that model's hypotheses.",
+        "to a given model.",
         "",
-        "### 1. The harness's effect splits by model family",
+        "### 1. Does the harness help? It depends on the model.",
         "",
-        "Adding the harness helps Claude and o1, is roughly flat for GPT-5, "
-        "and hurts both Gemini models:",
+        "Run with vs. without the harness, the effect on tournament standing "
+        "splits cleanly: Claude and o1 gain a lot, GPT-5 is flat, both Gemini "
+        "models regress.",
         "",
         "| model | direct (no harness) | pipeline (harness) | Δ Elo | effect |",
         "| --- | --- | --- | --- | --- |",
@@ -411,36 +412,61 @@ def _headline_findings_section() -> str:
         "| gemini-3-flash | 2-12 (1110) | 0-14 (1074) | −37 | regression |",
         "| gemini-3-pro | 12-2 (1275) | 7-7 (1186) | −89 | regression |",
         "",
-        "_(Δ Elo is within-bench: haiku/o1 sit in the paper-baseline pool, "
+        "_(Δ Elo is within-bench: haiku/o1 in the paper-baseline pool, "
         "opus/gpt-5/gemini-3 in the frontier pool — compare each model to "
         "itself, not across rows.)_",
         "",
-        "The pattern: Claude and o1 turn the literature tools into "
-        "tournament-winning hypotheses — haiku and opus go from losing records "
-        "raw to near-perfect in pipeline. Gemini does the opposite: it scores "
-        "well raw but the tool loop drags its rated hypothesis down. So the "
-        "harness is not a flat win — its value tracks the model.",
+        "Claude and o1 turn the literature tools into tournament-winning "
+        "hypotheses (haiku and opus go from losing records raw to near-perfect "
+        "in pipeline). Gemini scores well raw but the tool loop drags its "
+        "rated hypothesis down. The harness is not a flat win — its value "
+        "tracks the model.",
         "",
-        "### 2. The strict no-prior-evidence prompt is hard for every model",
+        "### 2. The harness changes quality, not whether a model finishes",
         "",
-        "Across the 14 hypotheses produced, **none** hit the paper's strict "
-        "top-3 (Nanvuranlat, KIRA6, Leflunomide) or the broader 5-drug list, "
-        "in either mode. Models surface plausible-but-unscored candidates "
-        "(Nitazoxanide, ND-646, Meldonium, Pitavastatin, Belapectin, …) rather "
-        "than the paper's picks. Recall needs more breadth than one Generation "
-        "call per candidate — multiple seeds (`--n 5+`) and iterative "
-        "refinement.",
+        "A natural question: do some models only complete *with* the harness? "
+        "No — it's the opposite. **Direct mode (no harness) is the easy path** "
+        "— one forced `record_hypothesis` call — and every direct candidate "
+        "that wasn't rate-limited produced a hypothesis. Of the 16 "
+        "candidates, only two produced nothing: `gemini-2-flash-thinking"
+        "[raw]` (a transient HTTP 429 from the provider) and "
+        "`gemini-2-pro[pipe]` (an empty completion on the forced final call). "
+        "The single *pipeline* miss is the harder-to-finish path, not the "
+        "direct one. So the harness doesn't decide whether a model can "
+        "produce a hypothesis — it decides how good that hypothesis is.",
+        "",
+        "### 3. Consistency: models converge on mechanisms, not specific drugs",
+        "",
+        "Across all 37 AML hypotheses recorded on this codebase, agreement is "
+        "at the **mechanism** level, not the compound level:",
+        "",
+        "| recurring theme | hypotheses (of 37) |",
+        "| --- | --- |",
+        "| leukemic-stem-cell (LSC) targeting | 20 |",
+        "| OXPHOS / mitochondrial complex I | 8 |",
+        "| BCL-2 / MCL-1 (Venetoclax axis) | 6 |",
+        "| FLT3-ITD | 6 |",
+        "| ferroptosis | 3 |",
+        "| fatty-acid oxidation | 3 |",
+        "",
+        "At the **drug** level it's a long tail of one-offs. The only "
+        "compounds proposed more than once are **Itraconazole** (×5, as an "
+        "OXPHOS inhibitor) and **Auranofin** (×2, thioredoxin-reductase). "
+        "**Venetoclax** appears ×6 but as the resistance/combo context, not "
+        "the novel candidate. Tellingly, all three recurrent names already "
+        "have prior AML evidence — models default to the familiar, which is "
+        "exactly what the strict no-prior-evidence prompt forbids (no "
+        "hypothesis in either bench hit the paper's gold-set picks).",
         "",
         "### Practical implications",
         "",
         "- **Match the mode to the model.** Run Claude / o1 through the "
         "  pipeline; for Gemini, `--candidate model@direct` is cheaper and "
         "  scores better on this task.",
-        "- **Strong base model + harness compounds.** The biggest gains "
-        "  (haiku +180, opus +97) come from models that use the tools well; a "
-        "  weaker fit (Gemini) loses ground.",
-        "- Expensive models still fit the budget: opus pipeline spent ~$0.80 "
-        "  of its $3/candidate cap on this prompt.",
+        "- **Recurrence is a weak novelty signal here.** The most-repeated "
+        "  picks are the least novel. Surfacing genuinely-novel candidates "
+        "  needs more breadth (multiple seeds, `--n 5+`) and iterative "
+        "  refinement, not a single Generation call.",
         "",
         "",
     ])
