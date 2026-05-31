@@ -158,7 +158,7 @@ judge               = "<cheap-model>"
 
 Providers are listed alphabetically — none is preferred; pick whichever you have a key for.
 
-| provider              | Endpoint                                                | Required key            | Example models                                            |
+| provider              | Endpoint                                                | API-key env var         | Example models                                            |
 | --------------------- | ------------------------------------------------------- | ----------------------- | --------------------------------------------------------- |
 | `anthropic`           | api.anthropic.com                                       | `ANTHROPIC_API_KEY`     | `claude-opus-4-7`, `claude-sonnet-4-6`                    |
 | `gemini` / `google`   | generativelanguage.googleapis.com (OpenAI-compat)       | `GEMINI_API_KEY`        | `gemini-2.5-pro`, `gemini-2.5-flash`                      |
@@ -169,6 +169,8 @@ Providers are listed alphabetically — none is preferred; pick whichever you ha
 | `openai_compatible`   | Anything else; set `[llm.openai] base_url` explicitly   | `OPENAI_API_KEY`        | depends                                                   |
 | `openrouter`          | openrouter.ai — 200+ models from every major vendor     | `OPENROUTER_API_KEY`    | `openai/gpt-5`, `google/gemini-2.5-pro`, `anthropic/claude-3.5-sonnet`, `meta-llama/llama-3.3-70b-instruct` |
 | `together`            | api.together.xyz                                        | `TOGETHER_API_KEY`      | `meta-llama/Llama-3.3-70B-Instruct-Turbo`                 |
+
+> Key precedence: for every OpenAI-compatible preset (`openrouter`, `gemini`, `groq`, `together`, `mistral`, `ollama`), `OPENAI_API_KEY` is used **first** if it's set, and the provider-specific var above is only the fallback. So if you have a stray `OPENAI_API_KEY` in your environment it will be sent to the preset's endpoint (and rejected) — unset it, or set only the provider's own key, when using a preset.
 
 Mixing vendors per session requires picking the provider once; for multi-vendor routing in a single session, use `provider = "openrouter"` and let OpenRouter dispatch upstream per model:
 
@@ -190,11 +192,11 @@ Any per-agent model can point at any vendor — the example above just mixes fou
 
 Cost is estimated via `co_scientist/llm/routing.py`'s `PRICE_TABLE`; unknown models match a family-hint (flash / mini / opus / sonnet / gemini / llama / mistral) so brand-new previews price sensibly. Tighten `[run] budget_usd` if running on a new model you haven't sanity-checked.
 
-**Provider feature support.** All providers run the full agent pipeline; these are the optional, vendor-specific accelerators. Anything not supported is transparently skipped, never an error:
+**Provider feature support.** Tool / function calling is **required** — the agent pipeline is built on it, so a provider (or `openai_compatible` endpoint) that can't do function calling won't work. The other three rows are optional vendor-specific accelerators: when a provider doesn't support one, it's transparently skipped, never an error.
 
 | Feature                     | `anthropic` | everything else (OpenAI + all OpenAI-compatible providers) |
 | --------------------------- | ----------- | ---------------------------------------------------------- |
-| Tool / function call        | ✅          | ✅ (native OpenAI; on other endpoints, depends on the endpoint) |
+| Tool / function call *(required)* | ✅    | ✅ native OpenAI; on other endpoints it must be supported or the run fails |
 | Extended reasoning          | ✅ via `thinking` budgets | ✅ via `reasoning_effort`, **only for reasoning models** — the model id must start with `o1`/`o3`/`o4` or contain `reasoning`; for any other model (e.g. `gpt-4o`) the thinking budget is dropped |
 | Prompt-cache breakpoints    | ✅          | ❌ (stripped before sending)                               |
 | Batch API (50%-off ranking) | ✅          | ❌ (Anthropic-only; other providers run all matches synchronously) |
